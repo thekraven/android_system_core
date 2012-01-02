@@ -444,10 +444,10 @@ void handle_control_message(const char *msg, const char *arg)
     }
 }
 
-#ifndef CHARGERMODE_CMDLINE_NAME  
-#define CHARGERMODE_CMDLINE_NAME "androidboot.battchg_pause"  
-#define CHARGERMODE_CMDLINE_VALUE "true"  
-#endif  
+#ifndef CHARGERMODE_CMDLINE_NAME
+#define CHARGERMODE_CMDLINE_NAME "androidboot.battchg_pause"
+#define CHARGERMODE_CMDLINE_VALUE "true"
+#endif
 
 static void import_kernel_nv(char *name, int in_qemu)
 {
@@ -466,7 +466,7 @@ static void import_kernel_nv(char *name, int in_qemu)
             strlcpy(console, value, sizeof(console));
         } else if (!strcmp(name,"androidboot.mode")) {
             strlcpy(bootmode, value, sizeof(bootmode));
-        } else if (!strcmp(name,CHARGERMODE_CMDLINE_NAME)) { 
+        } else if (!strcmp(name,CHARGERMODE_CMDLINE_NAME)) {
             strlcpy(battchg_pause, value, sizeof(battchg_pause));
         } else if (!strcmp(name,"androidboot.serialno")) {
             strlcpy(serialno, value, sizeof(serialno));
@@ -560,7 +560,7 @@ static int property_init_action(int nargs, char **args)
     bool load_defaults = true;
 
     INFO("property init\n");
-    if (!strcmp(bootmode, "charger") || !strcmp(battchg_pause, CHARGERMODE_CMDLINE_VALUE)) 
+    if (!strcmp(bootmode, "charger") || !strcmp(battchg_pause, CHARGERMODE_CMDLINE_VALUE))
         load_defaults = false;
     property_init(load_defaults);
     return 0;
@@ -804,7 +804,7 @@ int main(int argc, char **argv)
     action_for_each_trigger("init", action_add_queue_tail);
 
     /* skip mounting filesystems in charger mode */
-     if (strcmp(bootmode, "charger") != 0 || strcmp(battchg_pause, CHARGERMODE_CMDLINE_VALUE) != 0) { 
+    if (strcmp(bootmode, "charger") != 0 || strcmp(battchg_pause, CHARGERMODE_CMDLINE_VALUE) != 0) {
         action_for_each_trigger("early-fs", action_add_queue_tail);
     if(emmc_boot) {
         action_for_each_trigger("emmc-fs", action_add_queue_tail);
@@ -819,7 +819,7 @@ int main(int argc, char **argv)
     queue_builtin_action(signal_init_action, "signal_init");
     queue_builtin_action(check_startup_action, "check_startup");
 
-    if (!strcmp(bootmode, "charger") || !strcmp(battchg_pause, CHARGERMODE_CMDLINE_VALUE)) { 
+    if (!strcmp(bootmode, "charger") || !strcmp(battchg_pause, CHARGERMODE_CMDLINE_VALUE)) {
         action_for_each_trigger("charger", action_add_queue_tail);
     } else {
         action_for_each_trigger("early-boot", action_add_queue_tail);
