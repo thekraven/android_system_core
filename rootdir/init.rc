@@ -343,12 +343,6 @@ on property:service.adb.tcp.port=5555
 on property:service.adb.tcp.port=-1
     restart adbd
 
-on property:service.adb.tcp.port=5555
-    restart adbd
-
-on property:service.adb.tcp.port=-1
-    restart adbd
-
 service servicemanager /system/bin/servicemanager
     user system
     critical
