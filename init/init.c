@@ -393,8 +393,8 @@ void handle_control_message(const char *msg, const char *arg)
 }
 
 #ifndef CHARGERMODE_CMDLINE_NAME
-#define CHARGERMODE_CMDLINE_NAME "androidboot.battchg_pause"
-#define CHARGERMODE_CMDLINE_VALUE "true"
+#define CHARGERMODE_CMDLINE_NAME "lge.reboot" 
+#define CHARGERMODE_CMDLINE_VALUE "pwroff" 
 #endif
 
 static void import_kernel_nv(char *name, int in_qemu)
@@ -737,6 +737,14 @@ int main(int argc, char **argv)
             init_parse_config_file("/init.target.rc");
     }
 
+    /* If /proc/last_kmsg exists the phone has been rebooted, if not
+		it's a cold boot */
+    if (access("/proc/last_kmsg", R_OK) == 0)	{
+		battchg_pause = 0;
+	} else {
+        battchg_pause = 1;
+	}	
+	
     action_for_each_trigger("early-init", action_add_queue_tail);
 
     queue_builtin_action(wait_for_coldboot_done_action, "wait_for_coldboot_done");
@@ -765,7 +773,7 @@ int main(int argc, char **argv)
     action_for_each_trigger("boot", action_add_queue_tail);
 
         /* run all property triggers based on current state of the properties */
-    queue_builtin_action(queue_property_triggers_action, "queue_propety_triggers");
+    queue_builtin_action(queue_property_triggers_action, "queue_property_triggers");
 
 
 #if BOOTCHART
