@@ -29,6 +29,9 @@ typedef struct native_handle
     int data[0];        /* numFds + numInts ints */
 } native_handle_t;
 
+/* keep the old definition for backward source-compatibility */ 
+typedef native_handle_t native_handle; 
+
 /*
  * native_handle_close
  * 
