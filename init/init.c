@@ -91,6 +91,7 @@ static time_t process_needs_restart;
 static const char *ENV[32];
 
 static unsigned emmc_boot = 0;
+static unsigned thunderc_reboot = 0;
 
 /* add_environment - add "key=value" to the current environment */
 int add_environment(const char *key, const char *val)
@@ -466,7 +467,7 @@ static void import_kernel_nv(char *name, int in_qemu)
             strlcpy(console, value, sizeof(console));
         } else if (!strcmp(name,"androidboot.mode")) {
             strlcpy(bootmode, value, sizeof(bootmode));
-        } else if (!strcmp(name,CHARGERMODE_CMDLINE_NAME)) {
+        } else if (!strcmp(name,"androidboot.battchg_pause")) {
             strlcpy(battchg_pause, value, sizeof(battchg_pause));
         } else if (!strcmp(name,"androidboot.serialno")) {
             strlcpy(serialno, value, sizeof(serialno));
@@ -493,6 +494,14 @@ static void import_kernel_nv(char *name, int in_qemu)
         if (len < (int)sizeof(buff)) {
             property_set( buff, value );
         }
+    }
+    /* VM670 offline-charging test
+       If /proc/last_kmsg exists, the phone was rebooted,
+       if it doesn't exist, the phone was powered off */
+    if (access("/proc/last_kmsg", R_OK) == 0){
+        thunderc_reboot = 0;
+    } else {
+        thunderc_reboot = 1;
     }
 }
 
@@ -560,7 +569,7 @@ static int property_init_action(int nargs, char **args)
     bool load_defaults = true;
 
     INFO("property init\n");
-    if (!strcmp(bootmode, "charger") || !strcmp(battchg_pause, CHARGERMODE_CMDLINE_VALUE))
+    if (!strcmp(bootmode, "charger") || !strcmp(battchg_pause, "true"))
         load_defaults = false;
     property_init(load_defaults);
     return 0;
@@ -804,7 +813,7 @@ int main(int argc, char **argv)
     action_for_each_trigger("init", action_add_queue_tail);
 
     /* skip mounting filesystems in charger mode */
-    if (strcmp(bootmode, "charger") != 0 || strcmp(battchg_pause, CHARGERMODE_CMDLINE_VALUE) != 0) {
+    if (strcmp(bootmode, "charger") != 0 || strcmp(battchg_pause, "true") != 0 || thunderc_reboot == 0) {
         action_for_each_trigger("early-fs", action_add_queue_tail);
     if(emmc_boot) {
         action_for_each_trigger("emmc-fs", action_add_queue_tail);
@@ -819,7 +828,7 @@ int main(int argc, char **argv)
     queue_builtin_action(signal_init_action, "signal_init");
     queue_builtin_action(check_startup_action, "check_startup");
 
-    if (!strcmp(bootmode, "charger") || !strcmp(battchg_pause, CHARGERMODE_CMDLINE_VALUE)) {
+    if (!strcmp(bootmode, "charger") || !strcmp(battchg_pause, "true") || thunderc_reboot != 0) {
         action_for_each_trigger("charger", action_add_queue_tail);
     } else {
         action_for_each_trigger("early-boot", action_add_queue_tail);
