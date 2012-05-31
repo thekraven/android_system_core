@@ -59,8 +59,8 @@ static int   bootchart_count;
 #endif
 
 #ifndef BOARD_CHARGING_CMDLINE_NAME
-#define BOARD_CHARGING_CMDLINE_NAME "androidboot.battchg_pause"
-#define BOARD_CHARGING_CMDLINE_VALUE "true"
+#define BOARD_CHARGING_CMDLINE_NAME "lge.reboot"
+#define BOARD_CHARGING_CMDLINE_VALUE "pwroff"
 #endif
 
 static char console[32];
@@ -96,7 +96,6 @@ static time_t process_needs_restart;
 static const char *ENV[32];
 
 static unsigned emmc_boot = 0;
-
 static unsigned charging_mode = 0;
 
 /* add_environment - add "key=value" to the current environment */
@@ -451,10 +450,6 @@ void handle_control_message(const char *msg, const char *arg)
     }
 }
 
-#ifndef CHARGERMODE_CMDLINE_NAME
-#define CHARGERMODE_CMDLINE_NAME "androidboot.battchg_pause"
-#define CHARGERMODE_CMDLINE_VALUE "true"
-#endif
 
 static void import_kernel_nv(char *name, int in_qemu)
 {
@@ -501,6 +496,14 @@ static void import_kernel_nv(char *name, int in_qemu)
             property_set( buff, value );
         }
     }
+    /* VM670 offline-charging test
+       If /proc/last_kmsg exists, the phone was rebooted,
+       if it doesn't exist, the phone was powered off */
+    /*if (access("/proc/last_kmsg", R_OK) == 0){
+        thunderc_reboot = 0;
+    } else {
+        thunderc_reboot = 1; */
+
 }
 
 static struct command *get_first_command(struct action *act)

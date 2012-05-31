@@ -72,9 +72,9 @@ enum GGLFormatComponents {
 
 enum GGLFormatComponentIndex {
     GGL_INDEX_ALPHA   = 0,
-    GGL_INDEX_RED     = 3,
+    GGL_INDEX_RED     = 1,
     GGL_INDEX_GREEN   = 2,
-    GGL_INDEX_BLUE    = 1,
+    GGL_INDEX_BLUE    = 3,
     GGL_INDEX_STENCIL = 0,
     GGL_INDEX_DEPTH   = 1,
     GGL_INDEX_Y       = 0,
