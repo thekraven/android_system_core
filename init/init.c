@@ -484,7 +484,6 @@ static void import_kernel_nv(char *name, int in_qemu)
             if (!strcmp(value,"true")) {
                 emmc_boot = 1;
             }
-
         } else if (!strcmp(name,"androidboot.modelno")) {
             strlcpy(modelno, value, sizeof(modelno));
         }
